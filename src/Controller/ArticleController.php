@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\String\Slugger\SluggerInterface;
+
 
 class ArticleController extends AbstractController
 {
@@ -27,7 +30,7 @@ class ArticleController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    public function createArticle(Request $request): Response
+    public function createArticle(Request $request, SluggerInterface $slugger): Response
     {
         $article = new Article();
         $form = $this->createForm(ArticleType::class, $article);
@@ -47,7 +50,80 @@ class ArticleController extends AbstractController
             $article->setCreatedAt(new \DateTime());
 
             # Coder ici la logique pour uploader la photo
-            //
+
+             // On recupere le fichier du formulaire grace a getData(). Cela nous retoune un objet de type uploaded file
+              //vous trouverez tous les MimeType existant sur internet(moxilla developper)
+            
+            $file = $form->get('picture')->getData();
+            
+            //generer une contrainte d'upload, on declare un array avec deux valeurs de type string qui sont les
+            //MimeType autorisés (MimeType c'est le type du fichier)
+            if($file) {
+
+                //$allowedMimeType = ['image/jpeg', 'image/png'];
+
+                //La function native in_array() permet de comparer deux valeurs (2 arguments attendu)
+               // if(in_array($file->getMimeType(), $allowedMimeType)) { // $in_array Vien verifier si un valeur existe dans le table
+
+
+              //nous allons construire le nouveau nom du fichier:
+
+              //on stock dans une variable $originalFilename le nom du fichier
+               //on utilise encore une fonction native pathinfo()
+              $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+             
+             
+              //Recuperation de l'extension pour pouvoir reconstruire le nom quelques lignes apres
+              //on utilise la concartenation pour ajouter un point '.'
+               $extension = '.' . $file->guessExtension();
+
+               //Assainissement du nom au slugger fournier par symfony pour la construction du nouveau nom
+              // $safeFilename = $slugger->slug($article->getTitle());
+               $safeFilename = $slugger->slug($originalFilename);
+
+               #construction du  nouveau nom
+
+               //unigid est une function native qui permet de generer un id unique 
+
+              $newFilename = $safeFilename . '_' . uniqid() . $extension;
+
+
+               /**
+                *on utilise un try catch()lorsqu'on appelle une methode qui lance une erreur
+                */
+              try {
+
+                //ON appele la methode move() de UploadedFile pour pouvoir deplacer le fichier
+                //dans son dossier de destination
+                // Le dossier de destination a ete parametré dans services yaml
+
+                // ATTENTION : La methode move() lance une erreur de type FileException
+                //On attrappe cette erreur dans le catch(FileException $exception)
+                  
+                
+                $file->move($this->getParameter('upload_dir'), $newFilename);
+
+
+                // On set la nouvelle valeur (nom du fichier) le propriete picture de notre objet Article
+
+                  $article->setPicture($newFilename);
+
+              } catch (FileException $exception) {
+                  //code a executer si une erreur est attrapée')
+
+              }
+       //     }
+
+      //      else { // SI CE N'EST PAS LE BON fichier uploader
+      //          $this->addFlash('warning', 'Les types de fichier autorisés sont : .jpeg / .png');
+      //          return $this->redirectToRoute('create_article');
+      //      }
+                
+            }
+
+
+
+
 
             $this->entityManager->persist($article);
             $this->entityManager->flush();
