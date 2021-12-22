@@ -3,17 +3,19 @@
 namespace App\Form;
 
 use App\Entity\Article;
+use App\Entity\Category;
 use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ArticleType extends AbstractType
 {
@@ -36,7 +38,7 @@ class ArticleType extends AbstractType
 
                      new Length([
                          'min' => 3,
-                         'max' => 100,
+                         'max' => 255,
                          'minMessage' => 'Le sous-titre doit comporter {{ limit }} caractères au minimum.'
                      ])
 
@@ -49,6 +51,13 @@ class ArticleType extends AbstractType
                 'required' => true,
                 'attr' => ['placeholder' => 'Entrez unse description']
             ])
+
+            ->add('category',EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+                 'label' => 'Choisissez la catégorie de l\'article'
+            ])
+
             ->add('picture',FileType::class, [
                 'label' => 'Photo',
                 'required' => true,

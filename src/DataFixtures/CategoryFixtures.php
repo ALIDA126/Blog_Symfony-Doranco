@@ -7,9 +7,16 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
+
+/*
+    Les fixtures sont un jeux de données
+    Elles ervent a remplir la bdd juste apres la creation de la bdd 
+    pour pourvoir manipuler des données dans mon code => des entités
+ */
 class CategoryFixtures extends Fixture
 {
 
+    
     public function __construct(SluggerInterface $slugger)
     {
         $this->slugger = $slugger;
