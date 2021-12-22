@@ -16,6 +16,7 @@
                         <img src="{{ asset('uploads/' ~ article.picture)}}" class="card-img-top img-card-custom" alt="{{ article.subtitle | length > 30 ? article.subtitle|slice(0, 30) ~ '...' : article.subtitle }}">
                        <ul class="list-group list-group-flush">
                          <li class="list-group-item">Categorie : {{article.category.name}}</li>
+                         <li class="list-group-item">Auteur : {{ article.user.lastname ?? '' ~ ' ' ~ article.user.firstname ?? '' }}</li>
                             {# {{ dump(article.category.name) }} #}
                         </ul>
 
