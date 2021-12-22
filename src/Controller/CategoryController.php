@@ -20,12 +20,26 @@ class CategoryController extends AbstractController
     * @param EntityManagerInterface $entityManager
     */
 
-    public function createCategory(Request $request, SluggerInterface $slugger, EntityManagerInterface $entitymanager)
+    public function createCategory(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager)
 
 {
      $category = new Category();
 
      $form = $this->createform(CategoryType::class, $category)->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+       $category = $form->getData();
+
+       $category->setAlias($slugger->slug($category->getName()));
+
+       $entityManager->persist($category);
+       $entityManager->flush();//vien vider la memoire des données
+
+      $this->addFlash('success', 'La catégorie est bien crée');
+      return $this->redirectToRoute('dashboard');
+    }
+    
+    
+    
      return $this->render('dashboard/form_category.html.twig', [
         'form' => $form->createView()
      ]);
