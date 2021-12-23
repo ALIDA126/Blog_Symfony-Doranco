@@ -10,8 +10,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+
+/**
+*@IsGranted("ROLE_ADMIN")
+ */
 class DashboardController extends AbstractController
 {
     public function __construct(EntityManagerInterface $entityManager)
@@ -41,6 +46,8 @@ class DashboardController extends AbstractController
     }
 
     /**
+     * pour limiter l'acces a une route ou action en particulier a un role
+     * @IsGranted ("ROLE_SUPER_ADMIN")
      * @Route("/admin/supprimer/user/{id}", name="delete_user")
      * @param User $user
      * @return Response
