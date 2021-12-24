@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CommentaryRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -48,6 +49,12 @@ class Commentary
      */
     private $article;
 
+    public function __construct()
+    {
+    $this->createdAt = new \DateTime();
+    }
+
+    
     public function getId(): ?int
     {
         return $this->id;

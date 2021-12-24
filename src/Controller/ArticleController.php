@@ -5,14 +5,15 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Form\ArticleType;
+use App\Entity\Commentary;
 use App\Form\EditArticleType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 class ArticleController extends AbstractController
@@ -176,8 +177,13 @@ class ArticleController extends AbstractController
     {
         $article = $this->entityManager->getRepository(Article::class)->find($singleArticle->getId());
 
+        $commentaries = $this->entityManager->getRepository(Commentary::class)->findBy( ['article' =>$singleArticle->getId() ]);
+    
+
+
         return $this->render('article/show_article.html.twig', [
-            'article' => $article
+            'article' => $article,
+            'commentaries' => $commentaries
         ]);
     }
 
